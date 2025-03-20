@@ -1,0 +1,91 @@
+import pandas as pd
+import numpy as np
+
+# Cargar el archivo CSV
+df = pd.read_csv("Data_CHF_Zhao_2020_ATE.csv")
+
+# Lista de variables numéricas
+numerical_cols = [
+    'pressure [MPa]', 'mass_flux [kg/m2-s]', 'x_e_out [-]',
+    'D_e [mm]', 'D_h [mm]', 'length [mm]', 'chf_exp [MW/m2]'
+]
+
+# Crear un diccionario para almacenar los resultados
+stats_dict = {
+    "Variable": [],
+    "Mean": [],
+    "Standard Deviation": [],
+    "SEM": [],
+    "SEM % of Mean": [],
+    "IQR": []
+}
+
+# Calcular las métricas para cada variable numérica
+for col in numerical_cols:
+    mean = df[col].mean()
+    std_dev = df[col].std()
+    sem = std_dev / np.sqrt(len(df[col]))
+    sem_percent = (sem / mean) * 100 if mean != 0 else np.nan
+    iqr = df[col].quantile(0.75) - df[col].quantile(0.25)
+    
+    # Almacenar resultados en el diccionario
+    stats_dict["Variable"].append(col)
+    stats_dict["Mean"].append(mean)
+    stats_dict["Standard Deviation"].append(std_dev)
+    stats_dict["SEM"].append(sem)
+    stats_dict["SEM % of Mean"].append(sem_percent)
+    stats_dict["IQR"].append(iqr)
+
+# Convertir el diccionario en un DataFrame
+df_stats = pd.DataFrame(stats_dict)
+
+# Mostrar el DataFrame con los resultados
+print(df_stats)
+
+import pandas as pd
+import numpy as np
+
+# Cargar el archivo CSV
+df = pd.read_csv("Data_CHF_Zhao_2020_ATE.csv")
+
+# Lista de columnas numéricas a analizar
+numerical_cols = [
+    "pressure [MPa]", "mass_flux [kg/m2-s]", "x_e_out [-]",
+    "D_e [mm]", "D_h [mm]", "length [mm]", "chf_exp [MW/m2]"
+]
+
+# Crear un diccionario para almacenar los resultados
+stats_dict = {
+    "Variable": [],
+    "Mean": [],
+    "Standard Deviation": [],
+    "SEM": [],
+    "SEM % of Mean": [],
+    "IQR": []
+}
+
+# Calcular las métricas para cada variable numérica
+for col in numerical_cols:
+    data = df[col].dropna()  # Eliminar valores nulos si los hay
+    mean = data.mean()
+    std_dev = data.std()
+    sem = std_dev / np.sqrt(len(data))
+    sem_percent = (sem / mean) * 100 if mean != 0 else np.nan
+    iqr = data.quantile(0.75) - data.quantile(0.25)
+    
+    # Almacenar resultados en el diccionario
+    stats_dict["Variable"].append(col)
+    stats_dict["Mean"].append(mean)
+    stats_dict["Standard Deviation"].append(std_dev)
+    stats_dict["SEM"].append(sem)
+    stats_dict["SEM % of Mean"].append(sem_percent)
+    stats_dict["IQR"].append(iqr)
+
+# Convertir el diccionario en un DataFrame
+df_stats = pd.DataFrame(stats_dict)
+
+# Mostrar el DataFrame con los resultados
+print(df_stats)
+
+# Guardar los resultados en un archivo CSV (opcional)
+df_stats.to_csv("stats_results.csv", index=False)
