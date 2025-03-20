@@ -89,3 +89,20 @@ print(df_stats)
 
 # Guardar los resultados en un archivo CSV (opcional)
 df_stats.to_csv("stats_results.csv", index=False)
+
+# Interpretación de las Medidas de Dispersión
+
+El análisis de las medidas de dispersión nos permite entender la variabilidad y precisión de los datos en el conjunto de datos de CHF. A continuación, se interpreta cada métrica calculada:
+
+- **Media**: Representa el valor promedio de cada variable. Por ejemplo, la presión media es aproximadamente **10.01 MPa**, lo que indica que la mayoría de los datos de presión están alrededor de este valor.
+
+- **Desviación Estándar**: Mide cuánto varían los datos con respecto a la media. Por ejemplo, la desviación estándar de la presión es **4.28 MPa**, lo que indica que los valores de presión pueden alejarse significativamente de la media, mostrando una alta variabilidad.
+
+- **Error Estándar de la Media (SEM)**: Indica la precisión de la media como estimador de la población. Un SEM bajo sugiere que la media de la muestra es una buena estimación de la media poblacional. En este caso, para la presión el SEM es **0.099 MPa**, lo que indica una estimación relativamente precisa.
+
+- **SEM % of Mean**: Expresa el SEM en términos relativos a la media. Un valor alto indica mayor incertidumbre relativa en la estimación de la media. En este caso, el **1.34% para el flujo de masa** indica que la incertidumbre es baja en comparación con el valor medio, mientras que el **16.82% para x_e_out** muestra una mayor incertidumbre relativa en la estimación de la media.
+
+- **Rango Intercuartílico (IQR)**: Mide la dispersión de los datos en la parte central de la distribución. Por ejemplo, el **IQR para el flujo de masa es 2414 kg/m²-s**, lo que indica que el 50% central de los valores se encuentra dentro de este rango, mostrando una alta variabilidad en esta variable.
+
+### Conclusión
+Las variables con alta desviación estándar y alto IQR, como el **flujo de masa y la longitud**, tienen una mayor variabilidad. Variables como **x_e_out** presentan una mayor incertidumbre relativa en la estimación de su media. Este análisis es clave para evaluar la precisión de los datos y determinar posibles fuentes de incertidumbre en el estudio.
