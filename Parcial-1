@@ -1,108 +1,65 @@
 import pandas as pd
 import numpy as np
+from scipy.stats import iqr
 
 # Cargar el archivo CSV
 df = pd.read_csv("Data_CHF_Zhao_2020_ATE.csv")
 
-# Lista de variables numéricas
-numerical_cols = [
-    'pressure [MPa]', 'mass_flux [kg/m2-s]', 'x_e_out [-]',
-    'D_e [mm]', 'D_h [mm]', 'length [mm]', 'chf_exp [MW/m2]'
-]
+# Seleccionar solo las columnas numéricas
+numerical_vars = df.select_dtypes(include=['number'])
 
-# Crear un diccionario para almacenar los resultados
-stats_dict = {
-    "Variable": [],
-    "Mean": [],
-    "Standard Deviation": [],
-    "SEM": [],
-    "SEM % of Mean": [],
-    "IQR": []
-}
+# Desviación estándar de las columnas numéricas
+std_devs = numerical_vars.std()
 
-# Calcular las métricas para cada variable numérica
-for col in numerical_cols:
-    mean = df[col].mean()
-    std_dev = df[col].std()
-    sem = std_dev / np.sqrt(len(df[col]))
-    sem_percent = (sem / mean) * 100 if mean != 0 else np.nan
-    iqr = df[col].quantile(0.75) - df[col].quantile(0.25)
-    
-    # Almacenar resultados en el diccionario
-    stats_dict["Variable"].append(col)
-    stats_dict["Mean"].append(mean)
-    stats_dict["Standard Deviation"].append(std_dev)
-    stats_dict["SEM"].append(sem)
-    stats_dict["SEM % of Mean"].append(sem_percent)
-    stats_dict["IQR"].append(iqr)
+# Medias de las columnas numéricas
+means = numerical_vars.mean()
 
-# Convertir el diccionario en un DataFrame
-df_stats = pd.DataFrame(stats_dict)
+# Cantidad de muestras para cada variable
+n_samples = numerical_vars.count()
+
+# Error estándar medio (SEM)
+sems = std_devs / np.sqrt(n_samples)
+
+# Porcentaje del error estándar respecto a la media
+sem_percentage = (sems / means) * 100
+
+# IQR utilizando la función iqr de scipy.stats
+iqr_data = numerical_vars.apply(iqr)
+
+# Crear un DataFrame para mostrar los resultados
+uncertainty_df = pd.DataFrame({
+    "Variable": numerical_vars.columns,
+    "Mean": means.values,
+    "Standard Deviation": std_devs.values,
+    "SEM": sems.values,
+    "SEM % of Mean": sem_percentage.values,
+    "IQR": iqr_data.values
+})
 
 # Mostrar el DataFrame con los resultados
-print(df_stats)
+print(uncertainty_df)
 
-import pandas as pd
-import numpy as np
+## Interpretación de los Resultados
 
-# Cargar el archivo CSV
-df = pd.read_csv("Data_CHF_Zhao_2020_ATE.csv")
 
-# Lista de columnas numéricas a analizar
-numerical_cols = [
-    "pressure [MPa]", "mass_flux [kg/m2-s]", "x_e_out [-]",
-    "D_e [mm]", "D_h [mm]", "length [mm]", "chf_exp [MW/m2]"
-]
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Crear un diccionario para almacenar los resultados
-stats_dict = {
-    "Variable": [],
-    "Mean": [],
-    "Standard Deviation": [],
-    "SEM": [],
-    "SEM % of Mean": [],
-    "IQR": []
-}
+# Configurar el estilo de Seaborn
+sns.set(style="whitegrid")
 
-# Calcular las métricas para cada variable numérica
-for col in numerical_cols:
-    data = df[col].dropna()  # Eliminar valores nulos si los hay
-    mean = data.mean()
-    std_dev = data.std()
-    sem = std_dev / np.sqrt(len(data))
-    sem_percent = (sem / mean) * 100 if mean != 0 else np.nan
-    iqr = data.quantile(0.75) - data.quantile(0.25)
-    
-    # Almacenar resultados en el diccionario
-    stats_dict["Variable"].append(col)
-    stats_dict["Mean"].append(mean)
-    stats_dict["Standard Deviation"].append(std_dev)
-    stats_dict["SEM"].append(sem)
-    stats_dict["SEM % of Mean"].append(sem_percent)
-    stats_dict["IQR"].append(iqr)
+# Crear una figura con subgráficos 3x3
+fig, axes = plt.subplots(3, 3, figsize=(18, 12))
+axes = axes.flatten()
 
-# Convertir el diccionario en un DataFrame
-df_stats = pd.DataFrame(stats_dict)
+# Lista de columnas numéricas
+numerical_cols = numerical_vars.columns
 
-# Mostrar el DataFrame con los resultados
-print(df_stats)
+# Graficar histogramas para cada variable numérica
+for i, col in enumerate(numerical_cols):
+    if i < len(axes):  # Asegurarse de no exceder el número de subgráficos
+        sns.histplot(numerical_vars[col], bins=30, kde=True, ax=axes[i])
+        axes[i].set_title(f"Histograma de {col}")
 
-# Guardar los resultados en un archivo CSV (opcional)
-df_stats.to_csv("stats_results.csv", index=False)
-
-# Interpretación de las Medidas de Dispersión
-
-El análisis de las medidas de dispersión nos permite entender la variabilidad y precisión de los datos en el conjunto de datos de CHF. A continuación, se interpreta cada métrica calculada:
-
-- **Media**: Representa el valor promedio de cada variable. Por ejemplo, la presión media es aproximadamente **10.01 MPa**, lo que indica que la mayoría de los datos de presión están alrededor de este valor.
-
-- **Desviación Estándar**: Mide cuánto varían los datos con respecto a la media. Por ejemplo, la desviación estándar de la presión es **4.28 MPa**, lo que indica que los valores de presión pueden alejarse significativamente de la media, mostrando una alta variabilidad.
-
-- **Error Estándar de la Media (SEM)**: Indica la precisión de la media como estimador de la población. Un SEM bajo sugiere que la media de la muestra es una buena estimación de la media poblacional. En este caso, para la presión el SEM es **0.099 MPa**, lo que indica una estimación relativamente precisa.
-
-- **SEM % of Mean**: Expresa el SEM en términos relativos a la media. Un valor alto indica mayor incertidumbre relativa en la estimación de la media. En este caso, el **1.34% para el flujo de masa** indica que la incertidumbre es baja en comparación con el valor medio, mientras que el **16.82% para x_e_out** muestra una mayor incertidumbre relativa en la estimación de la media.
-
-- **Rango Intercuartílico (IQR)**: Mide la dispersión de los datos en la parte central de la distribución. Por ejemplo, el **IQR para el flujo de masa es 2414 kg/m²-s**, lo que indica que el 50% central de los valores se encuentra dentro de este rango, mostrando una alta variabilidad en esta variable.
-
-### Conclusión
-Las variables con alta desviación estándar y alto IQR, como el **flujo de masa y la longitud**, tienen una mayor variabilidad. Variables como **x_e_out** presentan una mayor incertidumbre relativa en la estimación de su media. Este análisis es clave para evaluar la precisión de los datos y determinar posibles fuentes de incertidumbre en el estudio.
+# Ajustar el diseño
+plt.tight_layout()
