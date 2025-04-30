@@ -1,0 +1,204 @@
+from google.colab import files
+
+# Subir archivo
+uploaded = files.upload()
+
+import pandas as pd
+
+# Cargar el CSV
+df = pd.read_csv('sensor_readings_202503140543_cesar_20cm.csv')
+
+import pandas as pd
+import numpy as np
+from scipy import stats
+
+# Subir el archivo en Colab
+from google.colab import files
+uploaded = files.upload()
+
+# Cargar el CSV
+archivo = list(uploaded.keys())[0]  # Nombre del archivo subido
+df = pd.read_csv(archivo)
+
+# Usar solamente la columna 'distance_cm'
+datos = df['distance_cm']
+
+# Cálculos
+media = np.mean(datos)
+desviacion_estandar = np.std(datos, ddof=1)
+mae = np.mean(np.abs(datos - media))
+sem = stats.sem(datos)
+intervalo_confianza = stats.t.interval(0.95, len(datos)-1, loc=media, scale=sem)
+
+# Mostrar resultados
+print(f"Media (μ): {media:.2f} cm")
+print(f"Desviación estándar (σ): {desviacion_estandar:.2f} cm")
+print(f"Error absoluto medio (MAE): {mae:.2f} cm")
+print(f"Error estándar de la media (SEM): {sem:.2f} cm")
+print(f"Intervalo de confianza del 95%: ({intervalo_confianza[0]:.2f} cm, {intervalo_confianza[1]:.2f} cm)")
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# Subir el archivo
+from google.colab import files
+uploaded = files.upload()
+
+# Cargar el CSV
+archivo = list(uploaded.keys())[0]
+df = pd.read_csv(archivo)
+
+# Usar solamente la columna 'distance_cm'
+datos = df['distance_cm']
+
+# Cálculos
+media = np.mean(datos)
+desviacion_estandar = np.std(datos, ddof=1)
+mae = np.mean(np.abs(datos - media))
+sem = stats.sem(datos)
+intervalo_confianza = stats.t.interval(0.95, len(datos)-1, loc=media, scale=sem)
+
+# Mostrar resultados
+print(f"Media (μ): {media:.2f} cm")
+print(f"Desviación estándar (σ): {desviacion_estandar:.2f} cm")
+print(f"Error absoluto medio (MAE): {mae:.2f} cm")
+print(f"Error estándar de la media (SEM): {sem:.2f} cm")
+print(f"Intervalo de confianza del 95%: ({intervalo_confianza[0]:.2f} cm, {intervalo_confianza[1]:.2f} cm)")
+
+# Crear histograma
+plt.figure(figsize=(10,6))
+plt.hist(datos, bins=15, color='skyblue', edgecolor='black')
+plt.title('Histograma de distancias medidas')
+plt.xlabel('Distancia (cm)')
+plt.ylabel('Frecuencia')
+plt.grid(True)
+plt.show()
+
+# Subida del archivo
+from google.colab import files
+uploaded = files.upload()
+
+# Librerías
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# Cargar el CSV
+archivo = list(uploaded.keys())[0]
+df = pd.read_csv(archivo)
+
+# Usar solamente la columna 'distance_cm'
+datos = df['distance_cm']
+
+# Gráfica Q-Q
+plt.figure(figsize=(8, 6))
+stats.probplot(datos, dist="norm", plot=plt)
+plt.title("Gráfica Q-Q: ¿Distribución Normal?")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+## Estadísticas
+mean = np.mean(datos)
+std = np.std(datos, ddof=1)        # ddof=1 para muestra
+sem = stats.sem(datos)
+
+print(f"Media (μ): {mean:.2f} cm")
+print(f"Desviación estándar (σ): {std:.2f} cm")
+print(f"Incertidumbre estándar (SEM): {sem:.2f} cm")
+
+# Gráfico con líneas adicionales
+plt.figure(figsize=(10, 6))
+plt.hist(datos, bins=15, color='skyblue', edgecolor='black')
+
+# Media
+plt.axvline(mean, color='red', linestyle='--', label=f'Media: {mean:.2f} cm')
+
+# ±1σ
+plt.axvline(mean - std, color='blue', linestyle=':', label=f'-1σ: {mean - std:.2f} cm')
+plt.axvline(mean + std, color='blue', linestyle=':', label=f'+1σ: {mean + std:.2f} cm')
+
+# ±2σ
+plt.axvline(mean - 2*std, color='green', linestyle='--', label=f'-2σ: {mean - 2*std:.2f} cm')
+plt.axvline(mean + 2*std, color='green', linestyle='--', label=f'+2σ: {mean + 2*std:.2f} cm')
+
+# Intervalo de confianza del 95%
+plt.axvline(intervalo_confianza[0], color='purple', linestyle='-.', label=f'IC 95% inferior: {intervalo_confianza[0]:.2f} cm')
+plt.axvline(intervalo_confianza[1], color='purple', linestyle='-.', label=f'IC 95% superior: {intervalo_confianza[1]:.2f} cm')
+
+# Estilo del gráfico
+plt.title("Histograma de Distancias del Sensor HC-SR04")
+plt.xlabel("Distancia (cm)")
+plt.ylabel("Frecuencia")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# Distancia real (el objeto estaba a 20 cm del sensor)
+true_distance = 20.0  
+
+# Calcular errores absolutos
+errors = np.abs(datos - true_distance)
+
+# MAE y desviación estándar de las mediciones
+mae = np.mean(errors)
+std = np.std(datos, ddof=1)
+
+# Imprimir resultados
+print(f"Distancia real: {true_distance:.2f} cm")
+print(f"Error medio absoluto (MAE): {mae:.3f} cm")
+print(f"Desviación estándar: {std:.3f} cm")
+
+# Cálculo del error con signo (positivo o negativo)
+true_distance = 20.0  # Cambia este valor según tu configuración
+errors = datos - true_distance
+
+# Gráfico de errores
+plt.figure(figsize=(10, 6))
+plt.plot(errors.values, marker='o', linestyle='-', label="Error")
+plt.axhline(0, color='black', linestyle='--', label="Sin error")
+plt.axhline(0.3, color='red', linestyle=':', label="+3 mm")
+plt.axhline(-0.3, color='red', linestyle=':', label="-3 mm")
+
+plt.title("Error de Medición del Sensor HC-SR04")
+plt.xlabel("Medición Nº")
+plt.ylabel("Error (cm)")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(6, 6))
+plt.boxplot(errors, vert=True, patch_artist=True, boxprops=dict(facecolor='skyblue'))
+
+plt.title("Boxplot del Error de Medición")
+plt.ylabel("Error (cm)")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+from scipy.stats import norm
+
+# Tamaño de la muestra
+n = len(datos)
+
+# Z-score para 95% de confianza (distribución normal estándar)
+z = norm.ppf(0.975)  # Para 2 colas: 0.975 corresponde al 95% central
+
+# Margen de error (ME = z * σ / √n)
+me = z * std / np.sqrt(n)
+
+# Intervalo de confianza
+ci_lower = mean - me
+ci_upper = mean + me
+
+# Imprimir resultados
+print(f"Media: {mean:.2f} cm")
+print(f"Desviación estándar: {std:.2f} cm")
+print(f"N: {n}")
+print(f"Margen de error (95%): ±{me:.2f} cm")
+print(f"Intervalo de confianza al 95%: [{ci_lower:.2f} cm, {ci_upper:.2f} cm]")
